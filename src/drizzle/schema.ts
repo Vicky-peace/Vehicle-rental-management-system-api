@@ -201,6 +201,8 @@ export const fleetRelations = relations(FleetManagement, ({ one }) => ({
 
 export type TIUsers = typeof Users.$inferInsert;
 export type TSUsers = typeof Users.$inferSelect;
+export type  TIVehicleSpecifications = typeof VehicleSpecifications.$inferInsert;
+export type TSVehicleSpecifications = typeof VehicleSpecifications.$inferSelect;
 export type TIVehicles = typeof Vehicles.$inferInsert;
 export type TSVehicles = typeof Vehicles.$inferSelect;
 export type TIBookings = typeof Bookings.$inferInsert;
