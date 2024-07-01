@@ -51,3 +51,53 @@ export const registerUser = async (user: any) => {
         throw new Error('Registration failed. Please try again.');
     }
 }
+
+export const loginUser = async (email: string, password: string) => {
+    // Validate login data against the login schema
+    loginSchema.parse({ email, password });
+
+    // Fetch the user by email
+    const users = await db.select().from(Users).where(eq(Users.email, email)).execute();
+
+    if (users.length === 0) {
+        throw new Error('User not found! Try Again');
+    }
+
+    const user = users[0];
+
+    // Fetch the user's hashed password from the Authentication table
+    const auths = await db.select().from(Authentication).where(eq(Authentication.user_id, user.user_id)).execute();
+
+    if (auths.length === 0) {
+        throw new Error('Invalid credentials! Try again');
+    }
+
+    const auth = auths[0];
+
+    // Validate the provided password against the stored hashed password
+    const isPasswordValid = await bcrypt.compare(password, auth.password);
+
+    if (!isPasswordValid) {
+        throw new Error('Invalid credentials! Try again');
+    }
+
+    // Create a JWT token
+    const token = jwt.sign(
+        { id: user.user_id, email: user.email, role: user.role },
+        secret!,
+        { expiresIn }
+    );
+
+    return { token, user };
+};
+
+export const verifyToken = (token: string) => {
+    try {
+        if (!secret) {
+            throw new Error('Secret is undefined');
+        }
+        return jwt.verify(token, secret);
+    } catch (error) {
+        throw new Error('Invalid token');
+    }
+};
