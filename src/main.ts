@@ -5,6 +5,7 @@ import {serve} from "@hono/node-server";
 
 //routes
 import { authRouter } from './auth/auth.router';
+import { userRouter } from './users/users.router';
 
 
 
@@ -17,7 +18,7 @@ app.get('/', async(c) =>{
 })
 
 app.route('/', authRouter)
-
+app.route('/', userRouter)
 
 
 serve({
