@@ -1,18 +1,11 @@
 import "dotenv/config";
-import {drizzle} from "drizzle-orm/node-postgres";
-import {Client} from "pg";
+import { drizzle, NeonHttpDatabase } from "drizzle-orm/neon-http";
+import { neon } from "@neondatabase/serverless";
 import * as schema from './schema';
 
-export const client = new Client({
-    connectionString: process.env.DATABASE_URL,
-});
+const databaseUrl = process.env.DATABASE_URL as string;
+if (!databaseUrl) throw new Error("DATABASE_URL is not set");
 
-const main = async () => {
-    await client.connect();
-}
+const sql = neon(databaseUrl);
 
-main();
-
-const db = drizzle(client, { schema, logger: true })  //create a drizzle instance
-
-export default db; 
+export const db: NeonHttpDatabase<typeof schema> = drizzle(sql, { schema, logger: true });
