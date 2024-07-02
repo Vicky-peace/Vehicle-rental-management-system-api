@@ -8,6 +8,7 @@ import { authRouter } from './auth/auth.router';
 import { userRouter } from './users/users.router';
 import { vehicleSpecificationRouter } from './vehicle_specifications/vehicleSpecifiactions.router';
 import { locationRouter } from './locations/locations.router';
+import { vehicleRouter } from './vehicles/vehicle.router';
 
 
 
@@ -23,6 +24,7 @@ app.route('/', authRouter)
 app.route('/', userRouter)
 app.route('/', vehicleSpecificationRouter)
 app.route('/', locationRouter)
+app.route('/', vehicleRouter)
 
 
 serve({

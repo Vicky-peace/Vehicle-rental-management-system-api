@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { locationsService,getLocationsService,updateLocationsService,deleteLocationsService,createLocationsService} from "./locations.service";
-import { parse } from "path";
+
 
 export const listLocation = async (c:Context) =>{
     try {
