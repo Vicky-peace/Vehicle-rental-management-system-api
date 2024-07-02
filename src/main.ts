@@ -9,6 +9,7 @@ import { userRouter } from './users/users.router';
 import { vehicleSpecificationRouter } from './vehicle_specifications/vehicleSpecifiactions.router';
 import { locationRouter } from './locations/locations.router';
 import { vehicleRouter } from './vehicles/vehicle.router';
+import { bookingRouter } from './bookings/bookings.router';
 
 
 
@@ -25,6 +26,7 @@ app.route('/', userRouter)
 app.route('/', vehicleSpecificationRouter)
 app.route('/', locationRouter)
 app.route('/', vehicleRouter)
+app.route('/', bookingRouter)
 
 
 serve({

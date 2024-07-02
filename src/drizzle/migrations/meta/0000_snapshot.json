@@ -1,5 +1,5 @@
 {
-  "id": "f85931e1-3732-4cfd-90ce-f3b0dcc0934f",
+  "id": "3abdb366-ebd9-4a02-8871-1ae9c82207f3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -90,13 +90,13 @@
         },
         "booking_date": {
           "name": "booking_date",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },
         "return_date": {
           "name": "return_date",
-          "type": "timestamp",
+          "type": "date",
           "primaryKey": false,
           "notNull": true
         },

@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, integer, boolean, timestamp, decimal, pgEnum } from 'drizzle-orm/pg-core';
+import { pgTable, serial, varchar, text, integer, boolean, timestamp, decimal, pgEnum, date } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enum Definitions
@@ -50,8 +50,8 @@ export const Bookings = pgTable('bookings', {
     user_id: integer('user_id').references(() => Users.user_id, { onDelete: 'cascade' }),
     vehicle_id: integer('vehicle_id').references(() => Vehicles.vehicleSpec_id, { onDelete: 'cascade' }),
     location_id: integer('location_id').references(() => LocationsAndBranches.location_id, { onDelete: 'cascade' }),
-    booking_date: timestamp('booking_date').notNull(),
-    return_date: timestamp('return_date').notNull(),
+    booking_date: date('booking_date').notNull(),
+    return_date: date('return_date').notNull(),
     total_amount: decimal('total_amount').notNull(),
     booking_status: bookingEnum("booking_status").default("Pending"),
     created_at: timestamp('created_at').defaultNow(),
