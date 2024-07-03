@@ -47,12 +47,10 @@ export const bookingSchema = z.object({
     user_id: z.number().int().positive(),
     vehicle_id: z.number().int().positive(),
     location_id: z.number().int().positive(),
-    booking_date: z.date(),
-    return_date: z.date(),
+    booking_date: z.string(),
+    return_date: z.string(),
     total_amount: z.number().positive(),
     booking_status: bookingStatusEnum.default("Pending").optional(),
-    created_at: z.date().default(new Date()).optional(),
-    updated_at: z.date().default(new Date()).optional(),
 });
 
 export type BookingSchema = z.infer<typeof bookingSchema>;

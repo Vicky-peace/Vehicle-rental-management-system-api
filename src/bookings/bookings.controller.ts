@@ -35,6 +35,14 @@ export const updateBooking = async (c:Context) =>{
     if(isNaN(id)) return c.text("Invalid ID", 400);
     const booking = await c.req.json();
     try {
+
+          //convert date strings to date objects
+          if(booking.booking_date){
+            booking.booking_date = new Date(booking.booking_date);
+        }
+        if(booking.return_date){
+            booking.return_date = new Date(booking.return_date);
+        }
         //search booking
         const searchBooking = await getBookingsService(id);
         if(!searchBooking){
@@ -51,8 +59,15 @@ export const updateBooking = async (c:Context) =>{
 }
 
 export const createBooking = async (c:Context) =>{
-    const booking = await c.req.json();
     try {
+        const booking = await c.req.json();
+        //convert date strings to date objects
+        if(booking.booking_date){
+            booking.booking_date = new Date(booking.booking_date);
+        }
+        if(booking.return_date){
+            booking.return_date = new Date(booking.return_date);
+        }
         const data = await createBookingsService(booking);
         if(!data) return c.json({message: 'Booking not created'}, 404);
         return c.json({message: data}, 200);
