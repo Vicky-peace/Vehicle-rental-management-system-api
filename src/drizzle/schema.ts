@@ -213,3 +213,5 @@ export type TICustomerSupportTickets = typeof CustomerSupportTickets.$inferInser
 export type TSCustomerSupportTickets = typeof CustomerSupportTickets.$inferSelect;
 export type TILocationsAndBranches = typeof LocationsAndBranches.$inferInsert;
 export type TSLocationGAndBranches = typeof LocationsAndBranches.$inferSelect;
+export type TIFleetManagement = typeof FleetManagement.$inferInsert;
+export type TSFleetManagement = typeof FleetManagement.$inferSelect;

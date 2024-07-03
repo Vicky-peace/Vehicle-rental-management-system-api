@@ -62,3 +62,13 @@ export const customerSupportSchema = z.object({
     description: z.string(),
     status: z.string().max(50).optional().nullable(),
 })
+
+export const fleetSchema = z.object({
+    fleet_id: z.number().int().optional(),
+    vehicle_id: z.number().int().positive(),
+    acquisition_date: z.string(),
+    depreciation_rate: z.number().positive(),
+    current_value: z.number().positive(),
+    maintenance_cost: z.number().positive(),
+    status: z.string().max(50),
+})

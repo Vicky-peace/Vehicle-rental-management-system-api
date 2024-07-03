@@ -11,6 +11,7 @@ import { locationRouter } from './locations/locations.router';
 import { vehicleRouter } from './vehicles/vehicle.router';
 import { bookingRouter } from './bookings/bookings.router';
 import { customerRouter } from './customer-support/customer.router';
+import { fleetRouter } from './fleet-management/fleet.router';
 
 
 
@@ -29,6 +30,7 @@ app.route('/', locationRouter)
 app.route('/', vehicleRouter)
 app.route('/', bookingRouter)
 app.route('/', customerRouter)
+app.route('/', fleetRouter)
 
 
 serve({
