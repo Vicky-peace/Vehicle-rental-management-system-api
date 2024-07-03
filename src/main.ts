@@ -10,6 +10,7 @@ import { vehicleSpecificationRouter } from './vehicle_specifications/vehicleSpec
 import { locationRouter } from './locations/locations.router';
 import { vehicleRouter } from './vehicles/vehicle.router';
 import { bookingRouter } from './bookings/bookings.router';
+import { customerRouter } from './customer-support/customer.router';
 
 
 
@@ -27,6 +28,7 @@ app.route('/', vehicleSpecificationRouter)
 app.route('/', locationRouter)
 app.route('/', vehicleRouter)
 app.route('/', bookingRouter)
+app.route('/', customerRouter)
 
 
 serve({

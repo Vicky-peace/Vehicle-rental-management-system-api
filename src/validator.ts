@@ -54,3 +54,11 @@ export const bookingSchema = z.object({
 });
 
 export type BookingSchema = z.infer<typeof bookingSchema>;
+
+export const customerSupportSchema = z.object({
+    ticket_id: z.number().int().optional(),
+    user_id: z.number().int().positive(),
+    subject: z.string().max(255),
+    description: z.string(),
+    status: z.string().max(50).optional().nullable(),
+})

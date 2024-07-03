@@ -209,5 +209,7 @@ export type TIBookings = typeof Bookings.$inferInsert;
 export type TSBookings = typeof Bookings.$inferSelect;
 export type TIPayments = typeof Payments.$inferInsert;
 export type TSPayments = typeof Payments.$inferSelect;
+export type TICustomerSupportTickets = typeof CustomerSupportTickets.$inferInsert;
+export type TSCustomerSupportTickets = typeof CustomerSupportTickets.$inferSelect;
 export type TILocationsAndBranches = typeof LocationsAndBranches.$inferInsert;
 export type TSLocationGAndBranches = typeof LocationsAndBranches.$inferSelect;
