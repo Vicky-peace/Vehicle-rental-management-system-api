@@ -1,6 +1,7 @@
 import {Hono} from 'hono';
 import "dotenv/config";
 import {serve} from "@hono/node-server";
+import {cors} from 'hono/cors';
 
 
 //routes
@@ -12,12 +13,16 @@ import { vehicleRouter } from './vehicles/vehicle.router';
 import { bookingRouter } from './bookings/bookings.router';
 import { customerRouter } from './customer-support/customer.router';
 import { fleetRouter } from './fleet-management/fleet.router';
+import { paymentsRouter } from './payments/payments.router';
 
 
 
 
 const app = new Hono();
 
+
+//CORS for all routes
+app.use('*', cors())
 
 app.get('/', async(c) =>{
     return c.json({message: 'Welcome to my API'});
@@ -31,6 +36,7 @@ app.route('/', vehicleRouter)
 app.route('/', bookingRouter)
 app.route('/', customerRouter)
 app.route('/', fleetRouter)
+app.route('/', paymentsRouter)
 
 
 serve({

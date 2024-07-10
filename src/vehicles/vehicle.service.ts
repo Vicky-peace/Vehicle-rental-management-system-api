@@ -1,4 +1,4 @@
-import { TIVehicles,TSVehicles,Vehicles } from "../drizzle/schema";
+import { TIVehicles,TSVehicles,Vehicles, VehicleSpecifications } from "../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { db } from "../drizzle/db";
 
@@ -31,4 +31,35 @@ export const deleteVehicleService = async (id: number) => {
 export const createVehicleService = async (vehicle: TIVehicles) => {
     await db.insert(Vehicles).values(vehicle).execute();
     return 'Vehicle created successfully';
+}
+
+//get vehicles together with their specifications   
+ export const getVehicleDetails = async (limit?: number): Promise<TSVehicles[]> => {
+    if(limit){
+        await db.query.Vehicles.findMany({
+            with: {
+                vehicleSpec: {
+                    columns: {
+                        manufacturer: true,
+                        model: true,
+                        year: true,
+                        fuel_type: true,
+                        engine_capacity: true,
+                        transmission: true,
+                        seating_capacity: true,
+                        color: true,
+                        features: true,
+                    },
+                },
+            },
+            columns: {
+                rental_rate: true,
+                availability: true,
+                vehicle_image: true
+            },
+            limit: limit
+        });
+
+    }
+    return await db.query.Vehicles.findMany();
 }

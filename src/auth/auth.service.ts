@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { db } from "../drizzle/db";
-import { Users, Authentication } from "../drizzle/schema";
+import { Users, Authentication,TIUsers} from "../drizzle/schema";
 import { userSchema,authSchema, loginSchema } from "../validator";
 import { eq } from "drizzle-orm";
 
@@ -91,13 +91,3 @@ export const loginUser = async (email: string, password: string) => {
     return { token, user };
 };
 
-export const verifyToken = (token: string) => {
-    try {
-        if (!secret) {
-            throw new Error('Secret is undefined');
-        }
-        return jwt.verify(token, secret);
-    } catch (error) {
-        throw new Error('Invalid token');
-    }
-};

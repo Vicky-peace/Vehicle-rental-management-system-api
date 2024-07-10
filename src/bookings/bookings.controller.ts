@@ -1,6 +1,6 @@
 import {Context} from "hono";
-import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService } from "./bookings.service";
-import { bookingSchema } from "../validator";
+import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,getUserWithBookingDetails} from "./bookings.service";
+
 
 export const getAllBookings = async (c:Context) =>{
     try {
@@ -93,3 +93,35 @@ export const deleteBooking = async (c:Context) =>{
         return c.json({error: error.message}, 400)
     }
 }
+
+export const getBookingsByUserId = async (c:Context) =>{
+    try {
+        const id = parseInt(c.req.param('id'));
+        if(isNaN(id)) return c.text("Invalid ID", 400);
+
+        const bookings = await getBookingsByUserIdService(id);
+        if(!bookings){
+            return c.json({message: 'Booking not found'}, 404);
+        }
+        return c.json(bookings, 200);
+    } catch (error: any) {
+        return c.json({error: error.message}, 400);
+    }
+
+}
+
+//get user with booking details
+export const getUserWithBookingDetailsController = async (c: Context) => {
+    try {
+      const data = await getUserWithBookingDetails();
+      console.log(data); 
+      if (!data || data.length === 0) {
+        return c.json({ message: 'Booking not found' }, 404);
+      }
+      return c.json(data, 200);
+    } catch (error: any) {
+      console.error('Error fetching booking details:', error);   
+      return c.json({ error: error.message }, 400);
+    }
+  };
+  

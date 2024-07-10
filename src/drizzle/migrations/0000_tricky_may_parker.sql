@@ -87,6 +87,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"contact_phone" varchar(15),
 	"address" text,
 	"role" "role" DEFAULT 'user',
+	"profile_image" varchar(255),
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now(),
 	CONSTRAINT "users_email_unique" UNIQUE("email")
@@ -112,6 +113,7 @@ CREATE TABLE IF NOT EXISTS "vehicles" (
 	"vehicle_id" integer,
 	"rental_rate" numeric NOT NULL,
 	"availability" boolean DEFAULT true,
+	"vehicle_image" varchar(255),
 	"created_at" timestamp DEFAULT now(),
 	"updated_at" timestamp DEFAULT now()
 );

@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { vehicleService, getVehicleService, updateVehicleService,deleteVehicleService,createVehicleService } from "./vehicle.service";
+import { vehicleService, getVehicleService, updateVehicleService,deleteVehicleService,createVehicleService,getVehicleDetails } from "./vehicle.service";
 
 
 export const getAllVehicles = async (c:Context) =>{
@@ -74,6 +74,19 @@ export const deleteVehicle = async (c:Context) =>{
         if(!res) return c.json({message: 'Vehicle not deleted'}, 404);
         return c.json({message: res}, 200);
     } catch (error:any) {
+        return c.json({error:error.message}, 400);
+    }
+}
+
+export const getVehicleDetailsHandler = async (c:Context) =>{
+    try {
+        const limit = Number(c.req.query('limit'));
+        const data = await getVehicleDetails(limit);
+        if(data == null || data.length == 0){
+            return c.json({message: 'Vehicle not found'}, 404);
+        }
+        return c.json(data, 200);
+    } catch (error: any) {
         return c.json({error:error.message}, 400);
     }
 }

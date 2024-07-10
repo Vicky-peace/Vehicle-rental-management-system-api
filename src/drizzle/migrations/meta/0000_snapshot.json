@@ -1,5 +1,5 @@
 {
-  "id": "516b4e44-d334-4568-a392-05c099d4abf8",
+  "id": "369f3259-788e-48a6-b2f1-e5b0a48fb7b3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -494,6 +494,12 @@
           "notNull": false,
           "default": "'user'"
         },
+        "profile_image": {
+          "name": "profile_image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -634,6 +640,12 @@
           "primaryKey": false,
           "notNull": false,
           "default": true
+        },
+        "vehicle_image": {
+          "name": "vehicle_image",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",

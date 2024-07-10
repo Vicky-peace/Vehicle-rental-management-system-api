@@ -14,6 +14,7 @@ export const Users = pgTable('users', {
     contact_phone: varchar('contact_phone', { length: 15 }),
     address: text('address'),
     role: roleEnum("role").default("user"),
+    profile_image: varchar('profile_image', { length: 255 }),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
 });
@@ -40,9 +41,13 @@ export const Vehicles = pgTable('vehicles', {
     vehicle_id: integer('vehicle_id').references(() => VehicleSpecifications.vehicle_id, { onDelete: 'cascade' }),
     rental_rate: decimal('rental_rate').notNull(),
     availability: boolean('availability').default(true),
+    vehicle_image: varchar('vehicle_image', { length: 255 }),
     created_at: timestamp('created_at').defaultNow(),
     updated_at: timestamp('updated_at').defaultNow(),
 });
+
+
+
 
 // Bookings Table
 export const Bookings = pgTable('bookings', {
@@ -215,3 +220,5 @@ export type TILocationsAndBranches = typeof LocationsAndBranches.$inferInsert;
 export type TSLocationGAndBranches = typeof LocationsAndBranches.$inferSelect;
 export type TIFleetManagement = typeof FleetManagement.$inferInsert;
 export type TSFleetManagement = typeof FleetManagement.$inferSelect;
+
+
