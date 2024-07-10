@@ -1,7 +1,8 @@
-import {eq } from "drizzle-orm";
+import {eq , and ,or} from "drizzle-orm";
 import { db } from "../drizzle/db";
-import { TSBookings,TIBookings, Bookings } from "../drizzle/schema";
-import {Users,VehicleSpecifications,LocationsAndBranches} from "../drizzle/schema";
+import { TSBookings,TIBookings, Bookings, Users, Vehicles} from "../drizzle/schema";
+
+
 export const bookingService = async (limit?:number): Promise<TSBookings[] | null> => {
     if(limit){
         return await db.query.Bookings.findMany({
@@ -39,6 +40,83 @@ export const getBookingsByUserIdService = async (id: number): Promise<TSBookings
     });
 }
 
+
+//Check for overlapping bookings
+const checkForOverlappingBookings = async (vehicleId: number, startDate: Date, endDate: Date):Promise<boolean> => {
+  const overlappingBookings = await db.query.Bookings.findMany({
+    where: and(
+      eq(Bookings.vehicle_id, vehicleId),
+      or(
+        and(
+          eq(Bookings.booking_date, startDate),
+          eq(Bookings.return_date, endDate)
+        ),
+        and(
+          eq(Bookings.booking_date, endDate),
+          eq(Bookings.return_date, startDate)
+        )
+      )
+    )
+  })
+  return overlappingBookings.length > 0;
+};
+
+
+// Create a booking with validation
+export const createBookingService = async (booking: TIBookings): Promise<TSBookings> => {
+  // Ensure vehicle_id is not undefined or null
+  if (booking.vehicle_id == null) {
+      throw new Error("Vehicle ID must be provided");
+  }
+
+  // Date validation
+  if (new Date(booking.booking_date) >= new Date(booking.return_date)) {
+      throw new Error("Booking date must be before return date");
+  }
+
+  // Overlap checking
+  const isOverlapping = await checkForOverlappingBookings(booking.vehicle_id, new Date(booking.booking_date), new Date(booking.return_date));
+  if (isOverlapping) {
+      throw new Error("The vehicle is already booked for the selected dates");
+  }
+
+  // Save booking to the database
+  try {
+    const result = await db.insert(Bookings).values(booking).returning().execute();
+
+    // Log the result for debugging purposes
+    console.log('Booking insertion result:', result);
+
+    return result[0] as TSBookings;
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw new Error("Booking creation failed");
+  }
+};
+
+
+type BookingStatus = "Pending" | "Confirmed" | "Cancelled" | "Completed" | null | undefined;
+
+
+
+
+// Additional logic for updating status, cancellations, etc.
+export const updateBookingStatusService = async (bookingId: number, status: BookingStatus): Promise<void> => {
+  await db.update(Bookings)
+      .set({ booking_status: status })
+      .where(eq(Bookings.booking_id, bookingId))
+      .execute();
+};
+
+export const cancelBookingService = async (bookingId: number): Promise<void> => {
+  await db.update(Bookings)
+      .set({ booking_status: 'Cancelled' })
+      .where(eq(Bookings.booking_id, bookingId))
+      .execute();
+};
+
+
+
 //get user with booking details
 export const getUserWithBookingDetails = async () => {
     return await db.query.Bookings.findMany({
@@ -71,111 +149,3 @@ export const getUserWithBookingDetails = async () => {
   };
   
 
-//other business logic
-// import { Bookings, Payments } from '../models/BookingModel';
-// import { Transaction } from 'drizzle-orm';
-
-// export const bookVehicle = async (
-//     userId: number,
-//     vehicleId: number,
-//     startDate: Date,
-//     endDate: Date,
-//     paymentMethod: string
-// ) => {
-//     const isAvailable = await checkVehicleAvailability(vehicleId, startDate, endDate);
-//     if (!isAvailable) {
-//         return { success: false, message: 'Vehicle is not available for the selected dates' };
-//     }
-
-//     // Transaction begins
-//     const transaction = await Bookings.$transaction(async (trans: Transaction) => {
-//         const booking = await Bookings.$query(trans).insert({
-//             user_id: userId,
-//             vehicle_id: vehicleId,
-//             booking_date: startDate,
-//             return_date: endDate,
-//             booking_status: 'Pending',
-//             total_amount: calculateRentalCost(vehicleId, startDate, endDate)
-//         });
-
-//         await Payments.$query(trans).insert({
-//             booking_id: booking.booking_id,
-//             amount: booking.total_amount,
-//             payment_status: 'Pending',
-//             payment_method: paymentMethod
-//         });
-
-//         return booking;
-//     });
-
-//     return { success: true, booking: transaction };
-// };
-
-// export const checkVehicleAvailability = async (
-//     vehicleId: number,
-//     startDate: Date,
-//     endDate: Date
-// ) => {
-//     const bookings = await Bookings.$query()
-//         .where('vehicle_id', vehicleId)
-//         .andWhere('booking_status', '!=', 'Cancelled')
-//         .andWhereRaw('NOT (return_date <= ? OR booking_date >= ?)', [startDate, endDate]);
-
-//     return bookings.length === 0; // True if no overlapping bookings
-// };
-
-// export const calculateRentalCost = (
-//     vehicleId: number,
-//     startDate: Date,
-//     endDate: Date
-// ) => {
-//     const days = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24);
-//     const ratePerDay = 100; // This would ideally come from the vehicle's data
-//     return days * ratePerDay;
-// };
-
-
-
-//controller
-// import { Context } from 'hono';
-// import { bookVehicle, checkVehicleAvailability } from './BookingService';
-
-// export const bookVehicleHandler = async (c: Context) => {
-//     const { userId, vehicleId, startDate, endDate, paymentMethod } = await c.req.json();
-//     try {
-//         const result = await bookVehicle(userId, vehicleId, new Date(startDate), new Date(endDate), paymentMethod);
-//         if (result.success) {
-//             return c.json(result, 200);
-//         } else {
-//             return c.json(result, 400);
-//         }
-//     } catch (error) {
-//         return c.json({ message: 'Internal server error', details: error.message }, 500);
-//     }
-// };
-
-// export const checkAvailabilityHandler = async (c: Context) => {
-//     const vehicleId = Number(c.req.query('vehicleId'));
-//     const startDate = new Date(c.req.query('startDate'));
-//     const endDate = new Date(c.req.query('endDate'));
-//     try {
-//         const available = await checkVehicleAvailability(vehicleId, startDate, endDate);
-//         return c.json({ available }, 200);
-//     } catch (error) {
-//         return c.json({ message: 'Internal server error', details: error.message }, 500);
-//     }
-// };
-
-
-
-
-//router
-// import { Hono } from 'hono';
-// import { bookVehicleHandler, checkAvailabilityHandler } from './BookingController';
-
-// const bookingRouter = new Hono();
-
-// bookingRouter.post('/book', bookVehicleHandler);
-// bookingRouter.get('/check-availability', checkAvailabilityHandler);
-
-// export default bookingRouter;

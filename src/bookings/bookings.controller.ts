@@ -1,5 +1,6 @@
 import {Context} from "hono";
-import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,getUserWithBookingDetails} from "./bookings.service";
+import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,getUserWithBookingDetails,createBookingService, updateBookingStatusService, cancelBookingService} from "./bookings.service";
+import { TIBookings } from "../drizzle/schema";
 
 
 export const getAllBookings = async (c:Context) =>{
@@ -109,6 +110,51 @@ export const getBookingsByUserId = async (c:Context) =>{
     }
 
 }
+
+//checks for overlapping bookings
+
+export const createBookingServiceController = async (c: Context) => {
+    try {
+        const booking: TIBookings = await c.req.json();
+        //convert date strings to date objects
+        if(booking.booking_date){
+            booking.booking_date = new Date(booking.booking_date);
+        }
+        if(booking.return_date){
+            booking.return_date = new Date(booking.return_date);
+        }
+
+      
+        const newBooking = await createBookingService(booking);
+        return c.json(newBooking, 201);
+    } catch (error: any) {
+        return c.json({ error: error.message }, 400);
+    }
+
+}
+
+
+export const updateBookingStatusController = async (c: Context) => {
+    try {
+       const {id} = c.req.param();
+       const {status} = await c.req.json();
+       await updateBookingStatusService(parseInt(id), status);
+       return c.json({ message: 'Booking status updated' }, 200);
+    } catch (error: any) {
+        return c.json({ error: error.message }, 400);
+    }
+}
+
+export const cancelBookingController = async (c: Context) => {
+    try {
+        const {id} = c.req.param();
+        await cancelBookingService(parseInt(id));
+        return c.json({ message: 'Booking cancelled' }, 200);
+    } catch (error: any) {
+        return c.json({ error: error.message }, 400);
+    }
+}
+
 
 //get user with booking details
 export const getUserWithBookingDetailsController = async (c: Context) => {
