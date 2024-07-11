@@ -8,7 +8,7 @@ import { eq } from "drizzle-orm";
 const secret = process.env.SECRET;
 const expiresIn = process.env.EXPIRESIN;
 
-export const registerUser = async (user: any) => {
+export const registerUser = async (user: any)=> {
     userSchema.parse(user);
     authSchema.parse(user); 
 

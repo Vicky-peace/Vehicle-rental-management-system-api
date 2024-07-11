@@ -1,5 +1,5 @@
 import {Context} from "hono";
-import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,getUserWithBookingDetails,createBookingService, updateBookingStatusService, cancelBookingService} from "./bookings.service";
+import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,createBookingService, updateBookingStatusService, cancelBookingService, getUserWithBookingDetails} from "./bookings.service";
 import { TIBookings } from "../drizzle/schema";
 
 

@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { vehicleServiceSpecifications, getVehicleSpecificationsService, updateVehicleSpecificationsService, deleteVehicleSpecificationsService,createVehicleSpecificationsService } from "./vehicleSpecifiactions.service";
+import { vehicleServiceSpecifications, getVehicleSpecificationsService, updateVehicleSpecificationsService, deleteVehicleSpecificationsService,createVehicleSpecificationsService, getVehicleWithSpecs,getVehicleWithSpecsById} from "./vehicleSpecifiactions.service";
 
 export const getAllVehicles = async (c:Context) =>{
     try {
@@ -81,6 +81,28 @@ export const createVehicle = async (c:Context) =>{
        
         return c.json({message: 'Vehicle specs created successfully'}, 201);
         
+    } catch (error: any) {
+        return c.json({error:error.message}, 400);
+    }
+}
+
+export const getVehicleWithSpecController = async (c:Context) =>{
+    try {
+        const data = await getVehicleWithSpecs();
+        if(!data || data.length == 0) return c.json({message: 'Vehicle not found'}, 404);
+        return c.json(data, 200);
+    } catch (error: any) {
+       return c.json({error:error.message}, 400); 
+    }
+}
+
+export const getVehicleWithSpecsByIdController = async (c:Context) => {
+    try {
+        const vehicleId = parseInt(c.req.param('id'));
+        if(isNaN(vehicleId)) return c.text("Invalid ID", 400);
+        const data = await getVehicleWithSpecsById(vehicleId);
+        if(!data) return c.json({message: 'Vehicle not found'}, 404);
+        return c.json(data, 200);
     } catch (error: any) {
         return c.json({error:error.message}, 400);
     }

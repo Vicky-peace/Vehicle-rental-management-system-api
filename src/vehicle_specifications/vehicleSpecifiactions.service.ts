@@ -1,5 +1,5 @@
 import {db} from "../drizzle/db";
-import  {TIVehicleSpecifications,TSVehicleSpecifications,VehicleSpecifications} from '../drizzle/schema';
+import  {TIVehicleSpecifications,TSVehicleSpecifications,VehicleSpecifications, Vehicles} from '../drizzle/schema';
 import {eq} from 'drizzle-orm';
 
 export const vehicleServiceSpecifications = async (limit?:number): Promise<TSVehicleSpecifications[] | null> => {
@@ -31,4 +31,64 @@ export const deleteVehicleSpecificationsService = async (id: number) => {
 export const createVehicleSpecificationsService = async (vehicle: TIVehicleSpecifications) => {
     await db.insert(VehicleSpecifications).values(vehicle).execute();
     return 'VehicleSpecifications created successfully';
+}
+
+export const getVehicleWithSpecs = async () => {
+    return await db.query.Vehicles.findMany({
+        columns:{
+            rental_rate: true,
+            availability: true,
+            vehicle_image: true,
+        },
+        with:{
+            vehicleSpec: {
+                columns:{
+                    manufacturer: true,
+                    model: true,
+                    year: true,
+                    fuel_type: true,
+                    engine_capacity: true,
+                    transmission: true,
+                    seating_capacity: true,
+                    color: true,
+                    features: true,
+                }
+            }
+        }
+    });
+
+}
+
+
+// Service to get a vehicle with its specifications by ID
+export const getVehicleWithSpecsById = async (vehicleId: number) => {
+    const result = await db.query.Vehicles.findMany({
+        where: eq(Vehicles.vehicleSpec_id, vehicleId),
+        columns: {
+            rental_rate: true,
+            availability: true,
+            vehicle_image: true,
+        },
+        with: {
+            vehicleSpec: {
+                columns: {
+                    manufacturer: true,
+                    model: true,
+                    year: true,
+                    fuel_type: true,
+                    engine_capacity: true,
+                    transmission: true,
+                    seating_capacity: true,
+                    color: true,
+                    features: true,
+                }
+            }
+        }
+    });
+
+    if (result.length === 0) {
+        throw new Error("Vehicle not found");
+    }
+
+    return result[0];
 }
