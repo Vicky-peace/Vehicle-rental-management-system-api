@@ -36,6 +36,8 @@ export const createVehicleSpecificationsService = async (vehicle: TIVehicleSpeci
 export const getVehicleWithSpecs = async () => {
     return await db.query.Vehicles.findMany({
         columns:{
+            vehicle_id: true,
+            vehicleSpec_id: true,
             rental_rate: true,
             availability: true,
             vehicle_image: true,
@@ -43,6 +45,7 @@ export const getVehicleWithSpecs = async () => {
         with:{
             vehicleSpec: {
                 columns:{
+                    vehicle_id: true,
                     manufacturer: true,
                     model: true,
                     year: true,
@@ -65,6 +68,7 @@ export const getVehicleWithSpecsById = async (vehicleId: number) => {
     const result = await db.query.Vehicles.findMany({
         where: eq(Vehicles.vehicleSpec_id, vehicleId),
         columns: {
+            vehicle_id: true,
             rental_rate: true,
             availability: true,
             vehicle_image: true,

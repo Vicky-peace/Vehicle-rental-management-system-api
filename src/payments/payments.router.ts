@@ -4,7 +4,7 @@ import { userRoleAuth,adminRoleAuth, adminOrUserAuth } from "../middleware/Autho
 
 export const paymentsRouter = new Hono();
 
-paymentsRouter.post('/payments',userRoleAuth,createPaymentController);
+paymentsRouter.post('/payments',createPaymentController);
 paymentsRouter.get('/payments/:booking_id', getPaymentByBookingController);
 paymentsRouter.put('/payments/:id', updatePaymentController);
 paymentsRouter.delete('/payments/:id', deletePaymentController);

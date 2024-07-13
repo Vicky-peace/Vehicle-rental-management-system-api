@@ -4,7 +4,7 @@ import { userRoleAuth,adminRoleAuth, adminOrUserAuth } from "../middleware/Autho
 
 export const userRouter = new Hono();
 
-userRouter.get("/users",userRoleAuth, listUsers);
+userRouter.get("/users", listUsers);
 userRouter.get("/users/:id", getUser);
 userRouter.put("/users/:id", updateUser);
 userRouter.delete("/users/:id", deleteUser);

@@ -6,7 +6,7 @@ import { userRoleAuth,adminRoleAuth, adminOrUserAuth } from "../middleware/Autho
 
 export const bookingRouter = new Hono();
 
-bookingRouter.get('/bookings',userRoleAuth, getAllBookings);
+bookingRouter.get('/bookings', getAllBookings);
 bookingRouter.get('/bookings/:id', getBooking);
 bookingRouter.put('/bookings/:id', zValidator('json', bookingSchema), updateBooking);
 bookingRouter.post('/bookings/:id/status', updateBookingStatusController);

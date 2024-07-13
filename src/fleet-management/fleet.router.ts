@@ -6,7 +6,7 @@ import { userRoleAuth,adminRoleAuth, adminOrUserAuth } from "../middleware/Autho
 
 export const fleetRouter = new Hono();
 
-fleetRouter.get('/fleet',userRoleAuth, getAllFleet);
+fleetRouter.get('/fleet', getAllFleet);
 fleetRouter.get('/fleet/:id', getFleet);
 fleetRouter.put('/fleet/:id', zValidator('json', fleetSchema), updateFleet);
 fleetRouter.post('/fleet', zValidator('json', fleetSchema), createFleet);
