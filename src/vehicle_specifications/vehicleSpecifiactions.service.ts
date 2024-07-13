@@ -1,6 +1,7 @@
 import {db} from "../drizzle/db";
-import  {TIVehicleSpecifications,TSVehicleSpecifications,VehicleSpecifications, Vehicles} from '../drizzle/schema';
+import  {TIVehicleSpecifications,TIVehicles,TSVehicleSpecifications,VehicleSpecifications, Vehicles} from '../drizzle/schema';
 import {eq} from 'drizzle-orm';
+import { z } from "zod";
 
 export const vehicleServiceSpecifications = async (limit?:number): Promise<TSVehicleSpecifications[] | null> => {
     if(limit){
@@ -96,3 +97,57 @@ export const getVehicleWithSpecsById = async (vehicleId: number) => {
 
     return result[0];
 }
+
+
+//create a veicle and its specs
+// Define the schema for validation
+const vehicleSpecSchema = z.object({
+    manufacturer: z.string(),
+    model: z.string(),
+    year: z.number(),
+    fuel_type: z.string(),
+    engine_capacity: z.string().optional(),
+    transmission: z.string().optional(),
+    seating_capacity: z.number().optional(),
+    color: z.string().optional(),
+    features: z.string().optional()
+  });
+  
+  const vehicleSchema = z.object({
+    rental_rate: z.string(),
+    availability: z.boolean().optional(),
+    vehicle_image: z.string().optional()
+  });
+  
+  // Service to insert data into both tables
+export const createVehicleWithSpecification = async (vehicleSpec: TIVehicleSpecifications, vehicle: TIVehicles) => {
+    // Validate the input data
+    vehicleSpecSchema.parse(vehicleSpec);
+    vehicleSchema.parse(vehicle);
+  
+    // Insert data into the vehicle_specifications table
+    const newVehicleSpec = await db.insert(VehicleSpecifications)
+      .values(vehicleSpec)
+      .returning({ id: VehicleSpecifications.vehicle_id })
+      .execute();
+  
+    const vehicleSpecId = newVehicleSpec[0].id;
+  
+    // Insert data into the vehicles table
+    try {
+      await db.insert(Vehicles)
+        .values({
+          vehicle_id: vehicleSpecId,
+          rental_rate: vehicle.rental_rate,
+          availability: vehicle.availability,
+          vehicle_image: vehicle.vehicle_image
+        })
+        .execute();
+  
+      return 'Vehicle with specifications created successfully';
+    } catch (error) {
+      // Rollback: delete the vehicle_specification if the second insert fails
+      await db.delete(VehicleSpecifications).where(eq(VehicleSpecifications.vehicle_id, vehicleSpecId)).execute();
+      throw new Error('Creation failed. Please try again.');
+    }
+  };

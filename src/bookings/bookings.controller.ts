@@ -1,5 +1,5 @@
 import {Context} from "hono";
-import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,createBookingService, updateBookingStatusService, cancelBookingService, getUserWithBookingDetails} from "./bookings.service";
+import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,createBookingService, updateBookingStatusService, cancelBookingService, getUserWithBookingDetails, getUserWithBookingDetailsById} from "./bookings.service";
 import { TIBookings } from "../drizzle/schema";
 
 
@@ -171,3 +171,18 @@ export const getUserWithBookingDetailsController = async (c: Context) => {
     }
   };
   
+
+export const getBookingsWithIdController = async  (c: Context) =>{
+    const userId = parseInt(c.req.param('userId'), 10);
+
+    if(isNaN(userId)){
+        return c.json({error: 'Invalid user ID'}, 400)
+    }
+
+    try {
+        const bookings = await getUserWithBookingDetailsById(userId);
+        return c.json(bookings, 200);
+    } catch (error: any) {
+      return c.json({error: error.message}, 500)  
+    }
+}

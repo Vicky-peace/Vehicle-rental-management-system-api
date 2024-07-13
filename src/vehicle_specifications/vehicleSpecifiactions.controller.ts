@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { vehicleServiceSpecifications, getVehicleSpecificationsService, updateVehicleSpecificationsService, deleteVehicleSpecificationsService,createVehicleSpecificationsService, getVehicleWithSpecs,getVehicleWithSpecsById} from "./vehicleSpecifiactions.service";
+import { vehicleServiceSpecifications, getVehicleSpecificationsService, updateVehicleSpecificationsService, deleteVehicleSpecificationsService,createVehicleSpecificationsService, getVehicleWithSpecs,getVehicleWithSpecsById,createVehicleWithSpecification} from "./vehicleSpecifiactions.service";
 
 export const getAllVehicles = async (c:Context) =>{
     try {
@@ -107,3 +107,18 @@ export const getVehicleWithSpecsByIdController = async (c:Context) => {
         return c.json({error:error.message}, 400);
     }
 }
+
+
+export const createVehicleWithSpecController = async (c: Context) => {
+    try {
+      const { vehicleSpec, vehicle } = await c.req.json();
+  
+      // Validate the incoming data here if necessary
+  
+      const result = await createVehicleWithSpecification(vehicleSpec, vehicle);
+      return c.json(result, 201);
+    } catch (error: any) {
+      console.error("Error in createVehicleWithSpecController:", error);
+      return c.json({ error: error.message }, 500);
+    }
+  };

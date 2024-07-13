@@ -6,6 +6,8 @@ import {
   Bookings,
   Users,
   Vehicles,
+  LocationsAndBranches,
+  VehicleSpecifications
 } from "../drizzle/schema";
 
 export const bookingService = async (
@@ -183,3 +185,42 @@ export const getUserWithBookingDetails = async () => {
 };
 
 
+
+
+export const getUserWithBookingDetailsById = async (userId: number): Promise<TSBookings[]> => {
+  return await db.query.Bookings.findMany({
+    where: eq(Bookings.user_id, userId),
+    columns: {
+      booking_id: true,
+      user_id: true,
+      created_at: true,
+      updated_at: true,
+      vehicle_id: true,
+      location_id: true,
+      booking_date: true,
+      return_date: true,
+      total_amount: true,
+      booking_status: true,
+    },
+    with: {
+      vehicle: {
+        columns: {
+          vehicle_id: true,
+          rental_rate: true,
+        },
+        with: {
+          vehicleSpec: {
+            columns: {
+              manufacturer: true,
+            },
+          },
+        },
+      },
+      location: {
+        columns: {
+          name: true,
+        },
+      },
+    },
+  });
+};
