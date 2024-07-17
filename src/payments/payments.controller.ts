@@ -1,6 +1,8 @@
 import { Context } from "hono";
 import { createPaymentService,getPaymentByBookingService, updatePaymentService,deletePaymentService} from "./payments.service";
-
+import { stripe } from "../drizzle/db";
+import Stripe from "stripe";
+import { ClientURL } from "../utils/utils";
 
 export const createPaymentController = async (c:Context) =>{
     try {
@@ -60,4 +62,55 @@ export const deletePaymentController = async (c:Context) =>{
     } catch (error: any) {
         return c.json({error: error.message}, 400);
     }
+}
+
+//Create a checkout session
+export const createCheckoutSessionController = async (c:Context) =>{
+    let booking;
+   try {
+    booking = await c.req.json();
+
+   } catch (error: any) {
+     return c.json({message: "Booking not found"}, 404);
+   }
+   try {
+    if(!booking.booking_id) return c.json({message: "Booking ID is Required"}, 404);
+
+    const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = [{
+        price_data: {
+            currency: 'usd',
+            product_data: {
+                name:  'Car Rental',
+            },
+            unit_amount: Math.round(booking.total_amount * 100), //convert to cents
+        },
+        quantity: 1,
+    }];
+    //checkout session
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+        payment_method_types: ['card'],
+        line_items,
+        mode: 'payment',
+        success_url: `${ClientURL}//dashboard/payment-successful`, //redirect url after payment successful
+        cancel_url: `${ClientURL}/dashboard/payment-failed`,
+    };  
+    const session: Stripe.Checkout.Session =await stripe.checkout.sessions.create(sessionParams);
+    console.log(`Checkout Session URL : ${session.url}`);
+
+
+    //save the payments to the db
+    const paymentDetails = {
+        booking_id: booking.booking_id,
+        amount: booking.total_amount.toString(),
+        user_id: booking.user_id,
+        payment_date: new Date(),
+        payment_method: 'card',
+        transaction_id: session.id,
+    };
+
+    const createPayment = await createPaymentService(paymentDetails);
+    return c.json({sessionId: session.id, url: session.url, payment: createPayment}, 200);
+   } catch (error: any) {
+     return c.json({message: error.message}, 400);
+   }
 }
