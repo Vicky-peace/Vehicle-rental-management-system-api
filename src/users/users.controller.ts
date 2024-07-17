@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { userService,getUserService , updateuserService,deleteUserService} from "./users.service";
+import { userService,getUserService , updateuserService,deleteUserService,updateUserDetails} from "./users.service";
 
 export const listUsers = async (c:Context) =>{
     try {
@@ -70,5 +70,20 @@ export const deleteUser = async (c:Context) =>{
 
     } catch (error: any) {
         return c.json({error:error.message}, 400);
+    }
+}
+
+export const updateUserDetailsController = async (c:Context) =>{
+    try {
+        const userId = Number(c.req.param('id'));
+        const userData = await c.req.json();
+
+        if(!userId) return c.json({message: 'User ID is required'}, 400);
+
+        const res = await updateUserDetails({...userData, user_id: userId});
+        return c.json({message: res}, 200);
+    } catch (error: any) {
+        return c.json({message: 'Failed to update user',error:error.message}, 400);
+        
     }
 }

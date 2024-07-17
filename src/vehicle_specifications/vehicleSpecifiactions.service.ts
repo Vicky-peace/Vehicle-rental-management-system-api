@@ -114,13 +114,16 @@ const vehicleSpecSchema = z.object({
   });
   
   const vehicleSchema = z.object({
-    rental_rate: z.string(),
+    rental_rate: z.number(),
     availability: z.boolean().optional(),
     vehicle_image: z.string().optional()
   });
   
-  // Service to insert data into both tables
-export const createVehicleWithSpecification = async (vehicleSpec: TIVehicleSpecifications, vehicle: TIVehicles) => {
+ // Service to insert data into both tables
+ export const createVehicleWithSpecification = async (vehicleSpec: TIVehicleSpecifications, vehicle: TIVehicles) => {
+    console.log('Vehicle Spec:', vehicleSpec);
+    console.log('Vehicle:', vehicle);
+  
     // Validate the input data
     vehicleSpecSchema.parse(vehicleSpec);
     vehicleSchema.parse(vehicle);
@@ -140,7 +143,7 @@ export const createVehicleWithSpecification = async (vehicleSpec: TIVehicleSpeci
           vehicle_id: vehicleSpecId,
           rental_rate: vehicle.rental_rate,
           availability: vehicle.availability,
-          vehicle_image: vehicle.vehicle_image
+          vehicle_image: vehicle.vehicle_image,
         })
         .execute();
   
@@ -149,5 +152,38 @@ export const createVehicleWithSpecification = async (vehicleSpec: TIVehicleSpeci
       // Rollback: delete the vehicle_specification if the second insert fails
       await db.delete(VehicleSpecifications).where(eq(VehicleSpecifications.vehicle_id, vehicleSpecId)).execute();
       throw new Error('Creation failed. Please try again.');
+    }
+  };
+  
+
+  export const updateVehicleWithSpecification = async (vehicleSpec: TIVehicleSpecifications, vehicle: TIVehicles, vehicleSpecId: number) => {
+    console.log('Vehicle Spec:', vehicleSpec);
+    console.log('Vehicle:', vehicle);
+    
+    // Validate the input data
+    vehicleSpecSchema.parse(vehicleSpec);
+    vehicleSchema.parse(vehicle);
+  
+    // Update data in the vehicle_specifications table
+    try {
+      await db.update(VehicleSpecifications)
+        .set(vehicleSpec)
+        .where(eq(VehicleSpecifications.vehicle_id, vehicleSpecId))
+        .execute();
+    
+      // Update data in the vehicles table
+      await db.update(Vehicles)
+        .set({
+          rental_rate: vehicle.rental_rate,
+          availability: vehicle.availability,
+          vehicle_image: vehicle.vehicle_image,
+        })
+        .where(eq(Vehicles.vehicle_id, vehicleSpecId))
+        .execute();
+    
+      return 'Vehicle with specifications updated successfully';
+    } catch (error) {
+      console.error('Update failed:', error);
+      throw new Error('Update failed. Please try again.');
     }
   };

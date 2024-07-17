@@ -1,5 +1,6 @@
 import { Context } from "hono";
-import { vehicleServiceSpecifications, getVehicleSpecificationsService, updateVehicleSpecificationsService, deleteVehicleSpecificationsService,createVehicleSpecificationsService, getVehicleWithSpecs,getVehicleWithSpecsById,createVehicleWithSpecification} from "./vehicleSpecifiactions.service";
+import { vehicleServiceSpecifications, getVehicleSpecificationsService, updateVehicleSpecificationsService, deleteVehicleSpecificationsService,createVehicleSpecificationsService, getVehicleWithSpecs,getVehicleWithSpecsById,createVehicleWithSpecification,updateVehicleWithSpecification} from "./vehicleSpecifiactions.service";
+import { ZodError } from 'zod';
 
 export const getAllVehicles = async (c:Context) =>{
     try {
@@ -108,17 +109,48 @@ export const getVehicleWithSpecsByIdController = async (c:Context) => {
     }
 }
 
-
 export const createVehicleWithSpecController = async (c: Context) => {
     try {
-      const { vehicleSpec, vehicle } = await c.req.json();
+      const requestBody = await c.req.json();
+      const vehicleSpec = requestBody.vehicleSpec;
+      const vehicle = requestBody.vehicle;
   
-      // Validate the incoming data here if necessary
+      if (!vehicleSpec || !vehicle) {
+        throw new Error('vehicleSpec and vehicle are required.');
+      }
+  
+      console.log('Received vehicleSpec:', vehicleSpec);
+      console.log('Received vehicle:', vehicle);
   
       const result = await createVehicleWithSpecification(vehicleSpec, vehicle);
       return c.json(result, 201);
     } catch (error: any) {
-      console.error("Error in createVehicleWithSpecController:", error);
+      console.error('Error in createVehicleWithSpecController:', error);
       return c.json({ error: error.message }, 500);
+    }
+  };
+  
+  
+  export const updateVehicleController = async (c: Context) => {
+    try {
+      const { vehicleSpec, vehicle } = await c.req.json();
+      console.log('Received vehicleSpec:', vehicleSpec);
+      console.log('Received vehicle:', vehicle);
+      const vehicleSpecId = parseInt(c.req.param('id'), 10);
+  
+      if (!vehicleSpec || !vehicle) {
+        throw new Error('Missing required data');
+      }
+  
+      const result = await updateVehicleWithSpecification(vehicleSpec, vehicle, vehicleSpecId);
+      
+      return c.json({ message: result }, 200);
+    } catch (error: any) {
+      if (error instanceof ZodError) {
+        console.error('Validation error:', error.errors);
+        return c.json({ message: 'Validation failed.', errors: error.errors }, 400);
+      }
+      console.error('Error updating vehicle:', error.message);
+      return c.json({ message: 'Update failed. Please try again.', error: error.message }, 500);
     }
   };
