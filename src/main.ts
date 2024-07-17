@@ -2,7 +2,7 @@ import {Hono} from 'hono';
 import "dotenv/config";
 import {serve} from "@hono/node-server";
 import {cors} from 'hono/cors';
-
+import { handleStripeWebhook } from './payments/payments.controller';
 
 //routes
 import { authRouter } from './auth/auth.router';
@@ -37,6 +37,9 @@ app.route('/', bookingRouter)
 app.route('/', customerRouter)
 app.route('/', fleetRouter)
 app.route('/', paymentsRouter)
+
+//stripe webhook
+app.post('/webhook', handleStripeWebhook)
 
 
 serve({
