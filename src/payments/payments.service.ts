@@ -21,6 +21,12 @@ export const updatePaymentService = async (id: number, payment: TIPayments) =>{
     return 'Payment updated successfully';
 }
 
+//update payment session_id
+export const updatePaymentSessionIdService = async (session_id: string) =>{
+    await db.update(Payments).set({payment_status: "Completed"}).where(eq(Payments.transaction_id, session_id)).execute();
+    return 'PaymentSession updated successfully';
+}
+
 export const deletePaymentService = async (id: number) => {
     await db.delete(Payments).where(eq(Payments.payment_id, id)).execute();
     return 'Payment deleted successfully';

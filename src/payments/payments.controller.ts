@@ -1,8 +1,9 @@
 import { Context } from "hono";
-import { createPaymentService,getPaymentByBookingService, updatePaymentService,deletePaymentService} from "./payments.service";
+import { createPaymentService,getPaymentByBookingService, updatePaymentService,deletePaymentService, updatePaymentSessionIdService} from "./payments.service";
 import { stripe } from "../drizzle/db";
 import Stripe from "stripe";
 import { ClientURL } from "../utils/utils";
+import "dotenv/config";
 
 export const createPaymentController = async (c:Context) =>{
     try {
@@ -117,3 +118,38 @@ export const createCheckoutSessionController = async (c:Context) =>{
 
 
 //Webhook
+export const handleStripeWebhook = async (c:Context) =>{
+    const sig = c.req.header('stripe-signature');
+    const rawBody = await c.req.text();
+    if(!sig){
+        console.log('Signature not provided');
+        return c.json({message:'Invalid Signature'}, 400);
+    }
+    let event: Stripe.Event;
+    try {
+        event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_ENDPOINT_SECRET as string);
+    } catch (error: any) {
+        console.log("Error", error.message);
+        return c.json({ message: `WebHook Error: ${error.message}` }, 400);
+    }
+
+    //handling the event
+    switch(event.type){
+        case 'checkout.session.completed':
+            const session = event.data.object as Stripe.Checkout.Session;
+
+            //update the payment
+            try {
+               const session_id = session.id;
+               const updateStatus = await  updatePaymentSessionIdService(session_id); 
+               return c.json({message: updateStatus}, 200);
+            } catch (error: any) {
+                return c.json({ message: `Database Error ${error.message}` }, 500);
+            }
+
+            //handle other events
+        default:
+            console.log(`Unhandled event type ${event.type}`);
+            return c.json({ message: `Unhandled event type ${event.type}` }, 200);
+    }
+}
