@@ -1,5 +1,5 @@
 import {Context} from "hono";
-import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,getBookingsByUserIdService,createBookingService, updateBookingStatusService, cancelBookingService, getUserWithBookingDetails, getUserWithBookingDetailsById} from "./bookings.service";
+import { bookingService , getBookingsService, updateBookingService, deleteBookingsService, createBookingsService,createBookingService, updateBookingStatusService, cancelBookingService, getUserWithBookingDetails,getUserWithBookingDetailsById} from "./bookings.service";
 import { TIBookings } from "../drizzle/schema";
 
 
@@ -95,21 +95,21 @@ export const deleteBooking = async (c:Context) =>{
     }
 }
 
-export const getBookingsByUserId = async (c:Context) =>{
-    try {
-        const id = parseInt(c.req.param('id'));
-        if(isNaN(id)) return c.text("Invalid ID", 400);
+// export const getBookingsByUserId = async (c:Context) =>{
+//     try {
+//         const id = parseInt(c.req.param('id'));
+//         if(isNaN(id)) return c.text("Invalid ID", 400);
 
-        const bookings = await getBookingsByUserIdService(id);
-        if(!bookings){
-            return c.json({message: 'Booking not found'}, 404);
-        }
-        return c.json(bookings, 200);
-    } catch (error: any) {
-        return c.json({error: error.message}, 400);
-    }
+//         const bookings = await getBookingsByUserIdService(id);
+//         if(!bookings){
+//             return c.json({message: 'Booking not found'}, 404);
+//         }
+//         return c.json(bookings, 200);
+//     } catch (error: any) {
+//         return c.json({error: error.message}, 400);
+//     }
 
-}
+// }
 
 //checks for overlapping bookings
 

@@ -31,3 +31,4 @@ export const deletePaymentService = async (id: number) => {
     await db.delete(Payments).where(eq(Payments.payment_id, id)).execute();
     return 'Payment deleted successfully';
 }
+

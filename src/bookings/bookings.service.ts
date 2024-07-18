@@ -4,6 +4,7 @@ import {
   TSBookings,
   TIBookings,
   Bookings,
+  Payments,
   Users,
   Vehicles,
   LocationsAndBranches,
@@ -48,14 +49,14 @@ export const deleteBookingsService = async (id: number) => {
   return "Booking deleted successfully";
 };
 
-//get booking by user_id
-export const getBookingsByUserIdService = async (
-  id: number
-): Promise<TSBookings[] | undefined> => {
-  return await db.query.Bookings.findMany({
-    where: eq(Bookings.user_id, id),
-  });
-};
+// //get booking by user_id
+// export const getBookingsByUserIdService = async (
+//   id: number
+// ): Promise<TSBookings[] | undefined> => {
+//   return await db.query.Bookings.findMany({
+//     where: eq(Bookings.user_id, id),
+//   });
+// };
 
 //Check for overlapping bookings
 const checkForOverlappingBookings = async (
@@ -221,6 +222,16 @@ export const getUserWithBookingDetailsById = async (userId: number): Promise<TSB
           name: true,
         },
       },
+      payments:{
+        columns:{
+          payment_id: true,
+          amount: true,
+          payment_status: true,
+          payment_date: true,
+          payment_method: true,
+          transaction_id: true,
+        }
+      }
     },
   });
 };
