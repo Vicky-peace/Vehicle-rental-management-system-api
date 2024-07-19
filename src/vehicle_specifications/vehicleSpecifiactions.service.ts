@@ -13,7 +13,7 @@ export const vehicleServiceSpecifications = async (limit?:number): Promise<TSVeh
 
     }
 
-export const getVehicleSpecificationsService = async (id: number): Promise<TSVehicleSpecifications | undefined> => {
+export const getVehicleSpecificationsService: (id: number) => Promise<TSVehicleSpecifications | undefined> = async (id) => {
     return await db.query.VehicleSpecifications.findFirst({
         where: eq(VehicleSpecifications.vehicle_id, id),
     }); 
