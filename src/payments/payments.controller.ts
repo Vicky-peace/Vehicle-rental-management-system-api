@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { createPaymentService,getPaymentByBookingService, updatePaymentService,deletePaymentService, updatePaymentSessionIdService} from "./payments.service";
+import { createPaymentService,getPaymentByBookingService, updatePaymentService,deletePaymentService, updatePaymentSessionIdService, getPaymentsService} from "./payments.service";
 import { stripe } from "../drizzle/db";
 import Stripe from "stripe";
 import { ClientURL } from "../utils/utils";
@@ -14,6 +14,17 @@ export const createPaymentController = async (c:Context) =>{
         return c.json({error: error.message}, 400);
     }
 }
+
+export const getAllPaymentsController = async (c:Context) =>{
+    try {
+        const payments = await getPaymentsService();
+        return c.json(payments, 200);
+    } catch (error: any) {
+        return c.json({error: error.message}, 400);
+    }
+
+}
+
 
 export const getPaymentByBookingController = async (c:Context) =>{
     try {

@@ -60,9 +60,8 @@ export const customerSupportSchema = z.object({
     user_id: z.number().int().positive(),
     subject: z.string().max(255),
     description: z.string(),
-    status: z.string().max(50).optional().nullable(),
-})
-
+    status: z.string().max(50).default('opened').optional().nullable(),
+  });
 export const fleetSchema = z.object({
     fleet_id: z.number().int().optional(),
     vehicle_id: z.number().int().positive(),

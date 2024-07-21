@@ -10,6 +10,16 @@ export const createPaymentService = async (payment: TIPayments) => {
 
 }
 
+export const getPaymentsService = async (limit?: number) => {
+    if(limit){
+        return await db.query.Payments.findMany({
+            limit: limit
+        });
+    }
+    return await db.query.Payments.findMany();
+
+}
+
 export const getPaymentByBookingService = async (booking_id: number) => {
     return await db.query.Payments.findFirst({
         where: eq(Payments.booking_id, booking_id),
