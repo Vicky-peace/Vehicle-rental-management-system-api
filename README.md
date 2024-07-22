@@ -54,5 +54,5 @@ CarHub is a vehicle booking platform that allows users to browse, book, and mana
 1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/your-repo/carhub-api.git
+   git clone https://github.com/Vicky-peace/Vehicle-rental-management-system-api.git
    cd carhub-api
