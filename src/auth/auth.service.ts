@@ -1,14 +1,17 @@
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import { sign } from "hono/jwt"; // Use Hono's JWT implementation instead
 import { db } from "../drizzle/db";
-import { Users, Authentication,TIUsers} from "../drizzle/schema";
-import { userSchema,authSchema, loginSchema } from "../validator";
+import { Users, Authentication, TIUsers } from "../drizzle/schema";
+import { userSchema, authSchema, loginSchema } from "../validator";
 import { eq } from "drizzle-orm";
 
-const secret = process.env.SECRET;
-const expiresIn = process.env.EXPIRESIN;
+// Define the secret with explicit type annotation
+const secret = process.env.SECRET || "fallback_secret";
+// Define expiresIn with explicit type annotation 
+const expiresIn = process.env.EXPIRESIN || "1d";
 
-export const registerUser = async (user: any)=> {
+export const registerUser = async (user: any) => {
+    // No changes to this function
     userSchema.parse(user);
     authSchema.parse(user); 
 
@@ -81,13 +84,15 @@ export const loginUser = async (email: string, password: string) => {
         throw new Error('Invalid credentials! Try again');
     }
 
-    // Create a JWT token
-    const token = jwt.sign(
-        { id: user.user_id, email: user.email, role: user.role },
-        secret!,
-        { expiresIn }
-    );
+    // CHANGED: Use Hono's sign function instead of jsonwebtoken
+    const payload = { 
+        id: user.user_id, 
+        email: user.email, 
+        role: user.role,
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 * 24) // 24 hours from now
+    };
+    
+    const token = sign(payload, secret);
 
     return { token, user };
 };
-
